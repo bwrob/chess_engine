@@ -2,11 +2,11 @@ import pygame
 from board import Board
 from evaluate import Evaluate
 from search import Search
-
+from pathlib import Path
 class Game:
     def __init__(self):
-        
-        pygame.init() 
+
+        pygame.init()
 
         self.board = Board()
         self.evaluate = Evaluate()
@@ -18,7 +18,7 @@ class Game:
         self.font = pygame.font.SysFont(None, 36)
         self.clock = pygame.time.Clock()
         self.running = True
-        
+
 
         self.square_size = int(self.screen_size / 10)
         self.board_size = len(self.board.state)
@@ -40,29 +40,30 @@ class Game:
         self.black_win = False
         self.stalemate = False
 
+        parent = Path(__file__).parent
         self.piece_images = {
-            1: pygame.transform.smoothscale(pygame.image.load('/Users/luke/CODE/CHESS ENGINE/w_pawn_png_1024px.png'), (self.piece_size, self.piece_size)),
-            2: pygame.transform.smoothscale(pygame.image.load('/Users/luke/CODE/CHESS ENGINE/w_knight_png_1024px.png'), (self.piece_size, self.piece_size)),
-            3: pygame.transform.smoothscale(pygame.image.load('/Users/luke/CODE/CHESS ENGINE/w_bishop_png_1024px.png'), (self.piece_size, self.piece_size)),
-            4: pygame.transform.smoothscale(pygame.image.load('/Users/luke/CODE/CHESS ENGINE/w_rook_png_1024px.png'), (self.piece_size, self.piece_size)),
-            5: pygame.transform.smoothscale(pygame.image.load('/Users/luke/CODE/CHESS ENGINE/w_queen_png_1024px.png'), (self.piece_size, self.piece_size)),
-            6: pygame.transform.smoothscale(pygame.image.load('/Users/luke/CODE/CHESS ENGINE/w_king_png_1024px.png'), (self.piece_size, self.piece_size)),
-            -1: pygame.transform.smoothscale(pygame.image.load('/Users/luke/CODE/CHESS ENGINE/b_pawn_png_1024px.png'), (self.piece_size, self.piece_size)),
-            -2: pygame.transform.smoothscale(pygame.image.load('/Users/luke/CODE/CHESS ENGINE/b_knight_png_1024px.png'), (self.piece_size, self.piece_size)),
-            -3: pygame.transform.smoothscale(pygame.image.load('/Users/luke/CODE/CHESS ENGINE/b_bishop_png_1024px.png'), (self.piece_size, self.piece_size)),
-            -4: pygame.transform.smoothscale(pygame.image.load('/Users/luke/CODE/CHESS ENGINE/b_rook_png_1024px.png'), (self.piece_size, self.piece_size)),
-            -5: pygame.transform.smoothscale(pygame.image.load('/Users/luke/CODE/CHESS ENGINE/b_queen_png_1024px.png'), (self.piece_size, self.piece_size)),
-            -6: pygame.transform.smoothscale(pygame.image.load('/Users/luke/CODE/CHESS ENGINE/b_king_png_1024px.png'), (self.piece_size, self.piece_size)),
+            1: pygame.transform.smoothscale(pygame.image.load(parent / 'w_pawn_png_1024px.png'), (self.piece_size, self.piece_size)),
+            2: pygame.transform.smoothscale(pygame.image.load(parent / 'w_knight_png_1024px.png'), (self.piece_size, self.piece_size)),
+            3: pygame.transform.smoothscale(pygame.image.load(parent / 'w_bishop_png_1024px.png'), (self.piece_size, self.piece_size)),
+            4: pygame.transform.smoothscale(pygame.image.load(parent / 'w_rook_png_1024px.png'), (self.piece_size, self.piece_size)),
+            5: pygame.transform.smoothscale(pygame.image.load(parent / 'w_queen_png_1024px.png'), (self.piece_size, self.piece_size)),
+            6: pygame.transform.smoothscale(pygame.image.load(parent / 'w_king_png_1024px.png'), (self.piece_size, self.piece_size)),
+            -1: pygame.transform.smoothscale(pygame.image.load(parent / 'b_pawn_png_1024px.png'), (self.piece_size, self.piece_size)),
+            -2: pygame.transform.smoothscale(pygame.image.load(parent / 'b_knight_png_1024px.png'), (self.piece_size, self.piece_size)),
+            -3: pygame.transform.smoothscale(pygame.image.load(parent / 'b_bishop_png_1024px.png'), (self.piece_size, self.piece_size)),
+            -4: pygame.transform.smoothscale(pygame.image.load(parent / 'b_rook_png_1024px.png'), (self.piece_size, self.piece_size)),
+            -5: pygame.transform.smoothscale(pygame.image.load(parent / 'b_queen_png_1024px.png'), (self.piece_size, self.piece_size)),
+            -6: pygame.transform.smoothscale(pygame.image.load(parent / 'b_king_png_1024px.png'), (self.piece_size, self.piece_size)),
         }
 
     def check_click(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            
+
             ## HANDLE CLICKS AND USER INPUT ON WHITE TURN VVVV
 
-            if self.active_team == 1: 
+            if self.active_team == 1:
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if self.promotion_possible:
                         for piece, rect in self.promotion_rects.items():
@@ -83,7 +84,7 @@ class Game:
                                                 self.black_win = True
                                         self.promotion_possible = False
                                         self.matched_moves = []
-                                        return  
+                                        return
                         return
 
                     mouse_x, mouse_y = event.pos
@@ -100,18 +101,18 @@ class Game:
                         if self.selected_square is not None:
                             moves = self.board.get_legal_moves(self.selected_square[0], self.selected_square[1])
                             legal_clicked_square = False
-                            
+
                             for move in moves:
                                 if row == move[0] and col == move[1]:
                                     legal_clicked_square = True
                                     break
 
-                            if legal_clicked_square: 
+                            if legal_clicked_square:
                                     matched_moves = []
                                     for move in moves:
                                         if row == move[0] and col == move[1]:
                                             matched_moves.append(move)
-                                            
+
                                     if len(matched_moves) > 1:
                                         self.promotion_possible = True
                                         self.matched_moves = matched_moves
@@ -166,7 +167,7 @@ class Game:
                                 self.current_col = None
 
                         else:
-                            if piece != 0:          
+                            if piece != 0:
                                 piece_team = 1 if piece > 0 else -1
                                 if piece_team == self.active_team:
                                     self.current_row = row
@@ -193,7 +194,7 @@ class Game:
 
         self.white_king_check_pos = white_king_pos
         self.black_king_check_pos = black_king_pos
-                            
+
     def draw(self):
         self.screen.fill("#000000")
         self.promotion_rects = {}
@@ -274,4 +275,4 @@ class Game:
         pygame.quit()
 
 game = Game()
-game.run() 
+game.run()
